@@ -1,0 +1,3 @@
+anthropic
+pypdf
+python-docx
