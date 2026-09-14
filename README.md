@@ -1,6 +1,6 @@
 # 365 Crawl Data
 
-Script Python dùng Claude API (Anthropic) để tự động đọc file hợp đồng khách sạn (PDF, DOCX, DOC, TXT) và trích xuất thông tin có cấu trúc (tên khách sạn, loại phòng, bảng giá theo mùa, chính sách...) ra file JSON.
+Script Python dùng Claude API (Anthropic) để tự động đọc file hợp đồng khách sạn (PDF, DOCX, DOC, TXT) và trích xuất thông tin có cấu trúc (tên khách sạn, loại phòng, bảng giá theo mùa, chính sách...) ra file Excel.
 
 ## Cấu trúc thư mục
 
@@ -8,15 +8,17 @@ Script Python dùng Claude API (Anthropic) để tự động đọc file hợp 
 365_crawl_data/
 ├── crawl.py            # Script chính
 ├── requirements.txt    # Danh sách thư viện cần cài
-├── data/                # Dữ liệu đầu vào (hợp đồng gốc) - KHÔNG đẩy lên Git
+├── .env                 # API key (tự tạo, KHÔNG đẩy lên Git)
+├── .env.example         # Mẫu file .env
+├── data/                # Dữ liệu đầu vào (hợp đồng gốc)
 │   └── HOTEL/
 │       └── HANOI/
 │           └── <Tên khách sạn>/
 │               └── ... (file .pdf, .docx, .doc, .txt)
-└── data_result/         # Dữ liệu đầu ra (JSON đã trích xuất) - KHÔNG đẩy lên Git
+└── data_result/         # Dữ liệu đầu ra (Excel đã trích xuất) - KHÔNG đẩy lên Git
 ```
 
-> Thư mục `data/` và `data_result/` không được đưa lên GitHub (xem `.gitignore`) vì chứa dữ liệu hợp đồng/giá cả nội bộ và dung lượng lớn. Bạn tự chuẩn bị dữ liệu này ở máy chạy script.
+> Thư mục `data_result/` không được đưa lên GitHub (xem `.gitignore`) vì là dữ liệu sinh ra từ script, người dùng nào cũng tự tạo lại được.
 
 ## Yêu cầu
 
@@ -40,13 +42,13 @@ pip install -r requirements.txt
 
 ## Cấu hình API key
 
-Script đọc API key từ biến môi trường `ANTHROPIC_API_KEY` (không hard-code key trong code). Đặt biến này trước khi chạy:
+Tạo file `.env` (copy từ `.env.example`) trong thư mục gốc project, điền key thật:
 
-```powershell
-$env:ANTHROPIC_API_KEY = "sk-ant-..."
+```
+ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-> Lưu ý: mỗi lần mở cửa sổ PowerShell mới bạn cần đặt lại biến này, trừ khi bạn set nó ở cấp hệ thống (System Environment Variables).
+Script tự động đọc key từ file `.env` này khi chạy (dùng `python-dotenv`), không cần set biến môi trường Windows thủ công. File `.env` đã được `.gitignore` chặn nên không bao giờ bị đẩy lên Git.
 
 ## Cách chạy
 
@@ -55,24 +57,35 @@ python crawl.py
 ```
 
 Script sẽ:
-1. Duyệt qua từng thư mục khách sạn trong `SOURCE_DIR` (mặc định `data/HANOI`)
+1. Duyệt qua từng thư mục khách sạn trong `SOURCE_DIR` (mặc định `data/HOTEL/HANOI`)
 2. Đọc toàn bộ file `.pdf`, `.docx`, `.doc`, `.txt` bên trong (kể cả thư mục con)
 3. Gửi nội dung cho Claude để trích xuất thông tin theo schema định sẵn
-4. Ghi kết quả JSON tương ứng vào `OUTPUT_BASE_DIR` (mặc định `data_result/HANOI`), giữ nguyên cấu trúc thư mục
+4. Ghi kết quả ra file **Excel (`.xlsx`)** tương ứng vào `OUTPUT_BASE_DIR` (mặc định `data_result/HANOI`), giữ nguyên cấu trúc thư mục
 
-Nếu file JSON kết quả đã tồn tại, script sẽ bỏ qua (không xử lý lại) để tiết kiệm chi phí gọi API.
+Nếu file Excel kết quả đã tồn tại, script sẽ bỏ qua (không xử lý lại) để tiết kiệm chi phí gọi API.
+
+### Định dạng file Excel kết quả
+
+Mỗi file `.xlsx` có 2 cột **Key / Value**. Các trường lồng nhau trong dữ liệu gốc được làm phẳng (flatten) bằng cách nối tên bằng dấu `_`, phần tử trong danh sách (array) được đánh số bắt đầu từ 0. Ví dụ:
+
+| Key | Value |
+|---|---|
+| hotel_information_hotel_name | Apricot |
+| contract_information_contract_name | Hợp đồng 2024 |
+| room_information_0_room_name | Deluxe |
+| room_information_1_room_name | Suite |
+| policies_raw_text_child_policy_0 | Trẻ dưới 6 tuổi miễn phí |
 
 ## Các tuỳ chọn cấu hình (đầu file `crawl.py`)
 
 | Biến | Ý nghĩa | Mặc định |
 |---|---|---|
-| `SOURCE_DIR` | Thư mục chứa dữ liệu gốc cần xử lý | `data/HANOI` |
-| `OUTPUT_BASE_DIR` | Thư mục ghi kết quả JSON | `data_result/HANOI` |
+| `SOURCE_DIR` | Thư mục chứa dữ liệu gốc cần xử lý | `data/HOTEL/HANOI` |
+| `OUTPUT_BASE_DIR` | Thư mục ghi kết quả Excel | `data_result/HANOI` |
 | `LIMIT_HOTELS` | Giới hạn số khách sạn xử lý (để test). Đặt `None` để chạy toàn bộ | `5` |
 | `MODEL_NAME` | Model Claude sử dụng | `claude-haiku-4-5` |
 
 ## Lưu ý quan trọng
 
-- **Đường dẫn dữ liệu thực tế**: dữ liệu mẫu trong `data/` hiện đang nằm ở `data/HOTEL/HANOI/...`, trong khi `SOURCE_DIR` mặc định trong code là `data/HANOI`. Hãy sửa `SOURCE_DIR` (và `OUTPUT_BASE_DIR` nếu cần) cho khớp với vị trí dữ liệu thực tế trước khi chạy, nếu không script sẽ báo "Không tìm thấy thư mục".
 - **Chi phí API**: mỗi file được xử lý sẽ tốn 1 lượt gọi Claude API, tính phí theo tài khoản Anthropic của bạn.
-- **Không commit API key**: tuyệt đối không hard-code hoặc commit API key vào code/Git.
+- **Không commit API key**: tuyệt đối không hard-code hoặc commit key thật vào code/Git — chỉ dùng file `.env` (đã bị `.gitignore` chặn).

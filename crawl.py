@@ -1,15 +1,18 @@
 import os
-import json
 from pathlib import Path
 from anthropic import Anthropic
+from dotenv import load_dotenv
+import openpyxl
 import pypdf
 import docx
+
+load_dotenv()
 
 # =============================================================
 # 1. CẤU HÌNH ĐƯỜNG DẪN VÀ THIẾT LẬP
 # =============================================================
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
-SOURCE_DIR = Path("data/HANOI")
+SOURCE_DIR = Path("data/HOTEL/HANOI")
 OUTPUT_BASE_DIR = Path("data_result/HANOI")
 
 # Đặt số lượng folder khách sạn cần test (None nếu muốn xử lý toàn bộ)
@@ -111,7 +114,36 @@ EXTRACTION_TOOL = {
 }
 
 # =============================================================
-# 3. TRÍCH XUẤT VĂN BẢN TỪ FILE
+# 3. LÀM PHẲNG DỮ LIỆU LỒNG NHAU VÀ GHI FILE EXCEL
+# =============================================================
+def flatten_data(obj, prefix=""):
+    """Làm phẳng dict/list lồng nhau thành dict 1 cấp, key nối bằng dấu '_' (vd: room_information_0_room_name)."""
+    flat = {}
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            new_key = f"{prefix}_{key}" if prefix else key
+            flat.update(flatten_data(value, new_key))
+    elif isinstance(obj, list):
+        for idx, item in enumerate(obj):
+            new_key = f"{prefix}_{idx}"
+            flat.update(flatten_data(item, new_key))
+    else:
+        flat[prefix] = obj
+    return flat
+
+
+def write_excel(data: dict, output_path: Path):
+    flat_data = flatten_data(data)
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Data"
+    ws.append(["Key", "Value"])
+    for key, value in flat_data.items():
+        ws.append([key, value])
+    wb.save(output_path)
+
+# =============================================================
+# 4. TRÍCH XUẤT VĂN BẢN TỪ FILE
 # =============================================================
 def read_text_from_file(file_path: Path) -> str:
     ext = file_path.suffix.lower()
@@ -156,7 +188,7 @@ def read_text_from_file(file_path: Path) -> str:
     return ""
 
 # =============================================================
-# 4. GỬI PROMPT VÀ GHI FILE KẾT QUẢ
+# 5. GỬI PROMPT VÀ GHI FILE KẾT QUẢ
 # =============================================================
 def process_file(source_file_path: Path, output_file_path: Path):
     output_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -187,8 +219,7 @@ def process_file(source_file_path: Path, output_file_path: Path):
 
         for block in response.content:
             if block.type == "tool_use" and block.name == "save_contract_data":
-                with open(output_file_path, "w", encoding="utf-8") as f:
-                    json.dump(block.input, f, ensure_ascii=False, indent=2)
+                write_excel(block.input, output_file_path)
                 print(f"      [✓] Hoàn thành: {output_file_path.name}")
                 return
 
@@ -196,7 +227,7 @@ def process_file(source_file_path: Path, output_file_path: Path):
         print(f"      [X] Lỗi API tại {source_file_path.name}: {e}")
 
 # =============================================================
-# 5. CHẠY VÒNG LẶP TOÀN BỘ CẤU TRÚC THƯ MỤC
+# 6. CHẠY VÒNG LẶP TOÀN BỘ CẤU TRÚC THƯ MỤC
 # =============================================================
 def main():
     if not SOURCE_DIR.exists():
@@ -224,10 +255,10 @@ def main():
 
         for f in all_files:
             relative_path = f.relative_to(hotel_dir)
-            target_json_path = (OUTPUT_BASE_DIR / hotel_name / relative_path).with_suffix(".json")
-            
+            target_xlsx_path = (OUTPUT_BASE_DIR / hotel_name / relative_path).with_suffix(".xlsx")
+
             print(f"    -> Đang xử lý: {relative_path}")
-            process_file(f, target_json_path)
+            process_file(f, target_xlsx_path)
 
     print("\n=== Hoàn thành! ===")
 
