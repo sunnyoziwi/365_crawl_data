@@ -137,9 +137,8 @@ def write_excel(data: dict, output_path: Path):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Data"
-    ws.append(["Key", "Value"])
-    for key, value in flat_data.items():
-        ws.append([key, value])
+    ws.append(list(flat_data.keys()))
+    ws.append(list(flat_data.values()))
     wb.save(output_path)
 
 # =============================================================
