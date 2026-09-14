@@ -1,0 +1,569 @@
+Date: Mon, 27 Mar 2023 18:09:22 +0700
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=16810977021.D4efd82.2563
+Content-Transfer-Encoding: 7bit
+Subject: The Anam Cam Ranh_UPDATED Promotion 28.4 - 3.5.2023 (Reunification
+ Day & Labor Day)
+From: "Ha Le | The Anam Cam Ranh" <sm2.cr@theanam.com>
+Sender: sm2.cr@theanam.com
+To: "'Truc Nguyen | The Anan Cam Ranh'" <se.cr@theanam.com>
+Message-Id: <040e01d9609c$b93a2320$2bae6960$@theanam.com>
+Delivered-To: holy.hoang@365travel.asia
+Received: by 2002:a05:7000:1001:b0:499:aead:4cb9 with SMTP id
+ k1csp1268298mae; Mon, 27 Mar 2023 04:10:58 -0700 (PDT)
+Received: from host.theanam.com (host.theanam.com. [67.225.249.174]) by
+ mx.google.com with ESMTPS id
+ j10-20020a05620a288a00b007251ba1ab87si19619516qkp.523.2023.03.27.04.10.57
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128); Mon, 27
+ Mar 2023 04:10:57 -0700 (PDT)
+Received: from [113.161.64.96] (port=37114 helo=SGCR06LT06) by
+ host.theanam.com with esmtpsa  (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.96) (envelope-from
+ <sm2.cr@theanam.com>) id 1pgkk3-000NUf-2j; Mon, 27 Mar 2023 18:10:26 +0700
+X-Google-Smtp-Source:
+ AKy350bRqauvX9xQ6fB2J490D7ESqFQPyKzmIoDRf93xjSzu5zD8tIv4lskAFwq/zmSnrcpRBHw3
+X-Received: by 2002:a05:6214:260f:b0:56b:fb58:c350 with SMTP id
+ gu15-20020a056214260f00b0056bfb58c350mr18286128qvb.26.1679915457676; Mon, 27
+ Mar 2023 04:10:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1679915457; cv=none; d=google.com;
+ s=arc-20160816;
+ b=GGwlUBU+yhegombc2f7gcR4g84fB/8KoqLLyeGkPloq05Acmk2E2VsD9aWeFCSsaJa
+ wLGWsTcujz771eSJLfYzMimFAwhXhHemzKGNfMNcf4ohuHmKVK3fKwilR6G6Lddo27Y2
+ Yp9zxp58gB7VYUzJbj8N2Xj1DTv1hL8urjXlmYJpv/cL2B1Gvz/7R4yovVNxIm8Y38in
+ yQo+b+yHoGMYIjbEr7oDpnPUlMwRUlpNU82qbkLek1Av1YMQS//ePQcxo5lGHTzdAT0U
+ hSmcrUwZK9mgpa+ruWzjl3dDWyK4IWWerXmhErJhOmHRNU2aZRylg5sgvuFbflCjtGg/ Ep6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com;
+ s=arc-20160816;
+ h=content-language:thread-index:mime-version:message-id:date:subject
+ :in-reply-to:references:to:from:dkim-signature;
+ bh=UgesQwAkStmiqLtyxsbN8OLMZt77zlhg49F/Q5jVlWM=;
+ b=I0/ddYfVpxDVJ8RIBFNTsHatPa75mFLx0ERsUBcSATVsXClqefvga4mjEb2L7rPUdz
+ sSy30iGjY1eRwYJnDiVuLyNlxbgRenC5V4zLS1KrZipuajDgdy2kI8GCoo4oXI+YvrBR
+ pny2H1IsRWrBfy0UULxLn8FPzPsrOSy04i/AzhRSctYhwL60JgUMUFpbGtT40B+TXmFT
+ gZyTywtEnhWErTB781P/lnaIhiU7wxBB825pUWRanUTD8/xsYk93amR0tWnBaq4rTMci
+ xCFY/93S9yri9RsJtxYowHxVZ65CK4A6xdtnPHtWKOcROsSTIU/FvVpyrS7iovyEVVaA Aqcg==
+ARC-Authentication-Results: i=1; mx.google.com; dkim=pass
+ header.i=@theanam.com header.s=default header.b=npnr9fBP; spf=pass
+ (google.com: domain of sm2.cr@theanam.com designates 67.225.249.174 as
+ permitted sender) smtp.mailfrom=sm2.cr@theanam.com; dmarc=pass (p=QUARANTINE
+ sp=QUARANTINE dis=NONE) header.from=theanam.com
+Return-Path: <sm2.cr@theanam.com>
+Received-SPF: pass (google.com: domain of sm2.cr@theanam.com designates
+ 67.225.249.174 as permitted sender) client-ip=67.225.249.174;
+Authentication-Results: mx.google.com; dkim=pass header.i=@theanam.com
+ header.s=default header.b=npnr9fBP; spf=pass (google.com: domain of
+ sm2.cr@theanam.com designates 67.225.249.174 as permitted sender)
+ smtp.mailfrom=sm2.cr@theanam.com; dmarc=pass (p=QUARANTINE sp=QUARANTINE
+ dis=NONE) header.from=theanam.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=theanam.com ; s=default;
+ h=Content-Type:MIME-Version:Message-ID:Date:Subject:In-Reply-To:
+ References:To:From:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+ Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+ :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+ List-Post:List-Owner:List-Archive;
+ bh=UgesQwAkStmiqLtyxsbN8OLMZt77zlhg49F/Q5jVlWM=; b=npnr9fBPXEpbvD/1bo77i7HIkt
+ jVTPG+5c8/jL80FOddh7dWl5lwgqGM8bcsmudkZEzwdhm0XZsbI84p+wGw7mmkjf6/WBXzlJRWs01
+ D2ZbIRQq+cYxHdnJIxPI4n+llVB6jVY6vs7mNIY7Ql8iiR4UgiEbhVsXF4B9UXPk9EjaV7Ea7NkeI
+ rCuAezk3JoHpIiyjjXiHsAdBiRr0FvRThWw0YQrnoCys0ByuHjt/99dd9W2YPEjkjz/3RczFxKdX4
+ WMY5z5VfIWxQ+MvxO8sraGHPqhqlRah2kMzkY3DypIyMnIP9S1aNNNwm+o1qj2Ne5+R8PQBA0Dhrn
+ OxNeirrA==;
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQLbmx0gnjwZje3vt5cRMc76k+T4iq0KAmQg
+Content-Language: en-us
+X-Antivirus: Avast (VPS 230326-4, 3/26/2023), Outbound message
+X-Antivirus-Status: Clean
+X-AntiAbuse: This header was added to track abuse, please include it with any
+ abuse report
+X-AntiAbuse: Primary Hostname - host.theanam.com
+X-AntiAbuse: Original Domain - 365travel.asia
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - theanam.com
+X-Get-Message-Sender-Via: host.theanam.com: authenticated_id:
+ sm2.cr@theanam.com
+X-Authenticated-Sender: host.theanam.com: sm2.cr@theanam.com
+
+
+--16810977021.D4efd82.2563
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary=16810977020.d7dE98.2563
+Content-Transfer-Encoding: 7bit
+Content-ID: <16810977022.aF0DFae8.2563@Linh-Chi-Macbook.local>
+
+
+--16810977020.d7dE98.2563
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+>
+>Images/attachments are not shown in the free version of MSG Viewer for Out=
+look:
+>
+> + image002.png [image/png]
+> + image004.png [image/png]
+> + image006.png [image/png]
+>
+>The licensed version can be purchased at https://msgviewerforoutlook.com/
+>(c) 2023 Element26, Inc.
+>
+
+
+K=C3=ADnh g=E1=BB=ADi Qu=C3=BD =C4=90=E1=BB=91i T=C3=A1c,
+
+=20
+
+Xin vui l=C3=B2ng b=E1=BB=8F qua email tr=C6=B0=E1=BB=9Bc.
+
+=20
+
+L=E1=BB=9Di ch=C3=A0o tr=C3=A2n tr=E1=BB=8Dng t=E1=BB=AB The Anam Cam Ranh =
+v=C3=A0 k=C3=ADnh ch=C3=BAc Qu=C3=BD =C4=90=E1=BB=91i T=C3=A1c kinh
+doanh th=C3=A0nh c=C3=B4ng v=C3=A0 ng=C3=A0y c=C3=A0ng ph=C3=A1t tri=E1=BB=
+=83n!
+
+=20
+
+Ch=C3=BAng t=C3=B4i xin g=E1=BB=ADi =C4=91=E1=BA=BFn Qu=C3=BD =C4=90=E1=BB=
+=91i T=C3=A1c th=C3=B4ng b=C3=A1o d=E1=BB=ABng ch=C6=B0=C6=A1ng tr=C3=ACnh =
+khuy=E1=BA=BFn
+m=C3=A3i gi=E1=BA=A3m s=C3=A2u 25% (=C3=A1p d=E1=BB=A5ng cho 4 lo=E1=BA=A1i=
+ ph=C3=B2ng =C4=91=E1=BA=A7u ti=C3=AAn =E2=80=93 2 =C4=91=C3=AAm 30/04 &
+01/05) giai =C4=91o=E1=BA=A1n L=E1=BB=85 Gi=E1=BB=97 T=E1=BB=95 v=C3=A0 30/=
+04 =E2=80=93 01/05 s=E1=BA=AFp t=E1=BB=9Bi.
+
+=20
+
+C=C3=A1c =C4=91=C6=A1n =C4=91=E1=BA=B7t ph=C3=B2ng l=C6=B0u tr=C3=BA m=E1=
+=BB=9Bi t=E1=BB=AB ng=C3=A0y 28/03/2023 giai =C4=91o=E1=BA=A1n n=C3=A0y s=
+=E1=BA=BD =C3=A1p
+d=E1=BB=A5ng b=E1=BA=A3ng gi=C3=A1 d=C6=B0=E1=BB=9Bi =C4=91=C3=A2y:
+
+=20
+
+Promotion for Reunification Day & Labor Day (from 28 Apr to 3 May 2023)
+
+ROOM CATEGORY
+
+30/04 & 01/05
+(2 nights)
+
+28/04 & 29/04
+02/05 & 03/05
+(4 nights)
+
+Balcony Garden View Room
+
+3,890,000
+
+2,917,000
+
+Balcony Sea View Room
+
+4,310,000
+
+3,232,000
+
+Garden View Premium
+
+4,520,000
+
+3,390,000
+
+Sea View Premium
+
+5,870,000
+
+4,402,000
+
+Ocean Front Premium
+
+6,980,000
+
+6,980,000
+
+Garden View Villa
+
+4,760,000
+
+4,760,000
+
+Pool View Villa
+
+5,560,000
+
+5,560,000
+
+Sea View Villa
+
+6,350,000
+
+6,350,000
+
+Ocean View Pool Villa
+
+10,430,000
+
+10,430,000
+
+Ocean Front Pool Villa
+
+11,300,000
+
+11,300,000
+
+Spa Villa With Private Pool One Bed Room
+
+11,910,000
+
+11,910,000
+
+Family Hill Villa with=20
+Private Pool Three Bedroom
+
+18,140,000
+
+18,140,000
+
+=20
+
+Ch=C6=B0=C6=A1ng tr=C3=ACnh n=C3=A0y kh=C3=B4ng =C3=A1p d
+
+>
+>Only the initial portion is displayed in the free version
+>=20
+
+
+--16810977020.d7dE98.2563
+Content-Type: text/html; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:x=3D"urn:schemas-microsoft-com:office:excel" xmlns:m=3D"http://schema=
+s.microsoft.com/office/2004/12/omml" xmlns=3D"http://www.w3.org/TR/REC-html=
+40"><head><meta name=3DGenerator content=3D"Microsoft Word 15 (filtered med=
+ium)"><!--[if !mso]><style>v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style><![endif]--><style><!--
+/* Font Definitions */
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:10.0pt;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+/* List Definitions */
+@list l0
+	{mso-list-id:207106768;
+	mso-list-type:hybrid;
+	mso-list-template-ids:288491500 67698689 67698691 67698693 67698689 676986=
+91 67698693 67698689 67698691 67698693;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l0:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l0:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3929;;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l0:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l0:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l0:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3929;;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l0:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l0:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l0:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3929;;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l1
+	{mso-list-id:747574121;
+	mso-list-template-ids:-1673095900;}
+@list l1:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:2.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:3.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:3.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:&#-3913;;
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]--></head><body lang=3DEN-US link=3D"#0563C1=
+" vlink=3D"#954F72" style=3D'word-wrap:break-word'><br>
+<table width=3D"75%" border=3D"1" align=3D"center" style=3D"padding:3px;">
+    <tr>
+        <td bgcolor=3D"#f5aa00" valign=3D"middle" style=3D"font-family:Aria=
+l, Helvetica, sans-serif; font-size:14px; color:#000000; padding:5px;">
+            <font style=3D"font-size:18px"><strong>Only the initial portion=
+ is displayed in the free version</strong><br><br>Images/attachments are no=
+t shown in the free version of MSG Viewer for Outlook:<br><pre>
+> + image002.png [image/png]
+> + image004.png [image/png]
+> + image006.png [image/png]
+</pre><br>The licensed version can be purchased at <strong><a href=3D"https=
+://msgviewerforoutlook.com/">https://msgviewerforoutlook.com/</a></strong><=
+br>(c) 2023 Element26, Inc.<br>
+      </font>
+        </td>
+    </tr>
+</table>
+<br><div class=3DWordSection1><p class=3DMsoNormal>K=C3=ADnh g&#7917;i Qu=
+=C3=BD =C4=90&#7889;i T=C3=A1c,<o:p></o:p></p><p class=3DMsoNormal><o:p>&nb=
+sp;</o:p></p><p class=3DMsoNormal><b>Xin vui l=C3=B2ng b&#7887; qua email t=
+r=C6=B0&#7899;c.<o:p></o:p></b></p><p class=3DMsoNormal><o:p>&nbsp;</o:p></=
+p><p class=3DMsoNormal>L&#7901;i ch=C3=A0o tr=C3=A2n tr&#7885;ng t&#7915; T=
+he Anam Cam Ranh v=C3=A0 k=C3=ADnh ch=C3=BAc Qu=C3=BD =C4=90&#7889;i T=C3=
+=A1c kinh doanh th=C3=A0nh c=C3=B4ng v=C3=A0 ng=C3=A0y c=C3=A0ng ph=C3=A1t =
+tri&#7875;n!<o:p></o:p></p><p class=3DMsoNormal><o:p>&nbsp;</o:p></p><p cla=
+ss=3DMsoNormal>Ch=C3=BAng t=C3=B4i xin g&#7917;i =C4=91&#7871;n Qu=C3=BD =
+=C4=90&#7889;i T=C3=A1c th=C3=B4ng b=C3=A1o <b>d&#7915;ng ch=C6=B0=C6=A1ng =
+tr=C3=ACnh khuy&#7871;n m=C3=A3i gi&#7843;m s=C3=A2u 25% (=C3=A1p d&#7909;n=
+g cho 4 lo&#7841;i ph=C3=B2ng =C4=91&#7847;u ti=C3=AAn =E2=80=93 2 =C4=91=
+=C3=AAm 30/04 &amp; 01/05)</b> giai =C4=91o&#7841;n L&#7877; Gi&#7895; T&#7=
+893; v=C3=A0 30/04 =E2=80=93 01/05 s&#7855;p t&#7899;i.<o:p></o:p></p><p cl=
+ass=3DMsoNormal><o:p>&nbsp;</o:p></p><p class=3DMsoNormal>C=C3=A1c =C4=91=
+=C6=A1n =C4=91&#7863;t ph=C3=B2ng l=C6=B0u tr=C3=BA m&#7899;i t&#7915; ng=
+=C3=A0y 28/03/2023 giai =C4=91o&#7841;n n=C3=A0y s&#7869; =C3=A1p d&#7909;n=
+g b&#7843;ng gi=C3=A1 d=C6=B0&#7899;i =C4=91=C3=A2y:<o:p></o:p></p><p class=
+=3DMsoNormal><o:p>&nbsp;</o:p></p><table class=3DMsoNormalTable border=3D0 =
+cellspacing=3D0 cellpadding=3D0 style=3D'border-collapse:collapse'><tr styl=
+e=3D'height:25.0pt'><td width=3D520 nowrap colspan=3D3 style=3D'width:390.0=
+pt;border:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:25.0pt'=
+><p class=3DMsoNormal align=3Dcenter style=3D'text-align:center'><b>Promoti=
+on for Reunification Day &amp; Labor Day (from 28 Apr to 3 May 2023)<o:p></=
+o:p></b></p></td></tr><tr style=3D'height:50.0pt'><td width=3D270 nowrap st=
+yle=3D'width:202.25pt;border:solid windowtext 1.0pt;border-top:none;padding=
+:0in 5.4pt 0in 5.4pt;height:50.0pt'><p class=3DMsoNormal align=3Dcenter sty=
+le=3D'text-align:center'><b>ROOM CATEGORY<o:p></o:p></b></p></td><td width=
+=3D126 style=3D'width:94.5pt;border-top:none;border-left:none;border-bottom=
+:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4=
+pt 0in 5.4pt;height:50.0pt'><p class=3DMsoNormal align=3Dcenter style=3D'te=
+xt-align:center'><b>30/04 &amp; 01/05<br>(2 nights)<o:p></o:p></b></p></td>=
+<td width=3D124 style=3D'width:93.25pt;border-top:none;border-left:none;bor=
+der-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;paddi=
+ng:0in 5.4pt 0in 5.4pt;height:50.0pt'><p class=3DMsoNormal align=3Dcenter s=
+tyle=3D'text-align:center'><b>28/04 &amp; 29/04<br>02/05 &amp; 03/05<br>(4 =
+nights)<o:p></o:p></b></p></td></tr><tr style=3D'height:20.0pt'><td width=
+=3D270 nowrap style=3D'width:202.25pt;border:solid windowtext 1.0pt;border-=
+top:none;padding:0in 5.4pt 0in 5.4pt;height:20.0pt'><p class=3DMsoNormal al=
+ign=3Dcenter style=3D'text-align:center'>Balcony Garden View Room<o:p></o:p=
+></p></td><td width=3D126 nowrap style=3D'width:94.5pt;border-top:none;bord=
+er-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid window=
+text 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:20.0pt'><p class=3DMsoNormal =
+align=3Dcenter style=3D'text-align:center'>3,890,000<o:p></o:p></p></td><td=
+ width=3D124 nowrap style=3D'width:93.25pt;border-top:none;border-left:none=
+;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;p=
+adding:0in 5.4pt 0in 5.4pt;height:20.0pt'><p class=3DMsoNormal align=3Dcent=
+er style=3D'text-align:center'><b>2,917,000<o:p></o:p></b></p></td></tr><tr=
+ style=3D'height:20.0pt'><td width=3D270 nowrap style=3D'width:202.25pt;bor=
+der:solid windowtext 1.0pt;border-top:none;padding:0in 5.4pt 0in 5.4pt;heig=
+ht:20.0pt'><p class=3DMsoNormal align=3Dcenter style=3D'text-align:center'>=
+Balcony Sea View Room<o:p></o:p></p></td><td width=3D126 nowrap style=3D'wi=
+dth:94.5pt;border-top:none;border-left:none;border-bottom:solid windowtext =
+1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;heigh=
+t:20.0pt'><p class=3DMsoNormal align=3Dcenter style=3D'text-align:center'>4=
+,310,000<o:p></o:p></p></td><td width=3D124 nowrap style=3D'width:93.25pt;b=
+order-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border=
+-right:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:20.0pt'><p=
+ class=3DMsoNormal align=3Dcenter style=3D'text-align:center'><b>3,232,000<=
+o:p></o:p></b></p></td></tr><tr style=3D'height:20.0pt'><td width=3D270 now=
+rap style=3D'width:202.25pt;border:solid windowtext 1.0pt;border-top:none;p=
+adding:0in 5.4pt 0in 5.4pt;height:20.0pt'><p class=3DMsoNormal align=3Dcent=
+er style=3D'text-align:center'>Garden View Premium<o:p></o:p></p></td><td w=
+idth=3D126 nowrap style=3D'width:94.5pt;border-top:none;border-left:none;bo=
+rder-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padd=
+ing:0in 5.4pt 0in 5.4pt;height:20.0pt'><p class=3DMsoNormal align=3Dcenter =
+style=3D'text-align:center'>4,520,000<o:p></o:p></p></td><td width=3D124 no=
+wrap style=3D'width:93.25pt;border-top:none;border-left:none;border-bottom:=
+solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4p=
+t 0in 5.4pt;height:20.0pt'><p class=3DMsoNormal align=3Dcenter style=3D'tex=
+t-align:center'><b>3,390,000<o:p></o:p></b></p></td></tr><tr style=3D'heigh=
+t:20.0pt'><td width=3D270 nowrap style=3D'width:202.25pt;border:solid windo=
+wtext 1.0pt;border-top:none;padding:0in 5.4pt 0in 5.4pt;height:20.0pt'><p c=
+lass=3DMsoNormal align=3Dcenter style=3D'text-align:center'>Sea View&nbsp;P=
+remium<o:p></o:p></p></td><td width=3D126 nowrap style=3D'width:94.5pt;bord=
+er-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-ri=
+ght:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:20.0pt'><p cl=
+ass=3DMsoNormal align=3Dcenter style=3D'text-align:center'>5,870,000<o:p></=
+o:p></p></td><td width=3D124 nowrap style=3D'width:93.25pt;border-top:none;=
+border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid wi=
+ndowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:20.0pt'><p class=3DMsoNor=
+mal align=3Dcenter style=3D'text-align:center'><b>4,402,000<o:p></o:p></b><=
+/p></td></tr><tr style=3D'height:20.0pt'><td width=3D270 nowrap style=3D'wi=
+dth:202.25pt;border:solid windowtext 1.0pt;border-top:none;padding:0in 5.4p=
+t 0in 5.4pt;height:20.0pt'><p class=3DMsoNormal align=3Dcenter style=3D'tex=
+t-align:center'>Ocean Front Premium<o:p></o:p></p></td><td width=3D126 nowr=
+ap style=3D'width:94.5pt;border-top:none;border-left:none;border-bottom:sol=
+id windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4pt 0=
+in 5.4pt;height:20.0pt'><p class=3DMsoNormal align=3Dcenter style=3D'text-a=
+lign:center'>6,980,000<o:p></o:p></p></td><td width=3D124 nowrap style=3D'w=
+idth:93.25pt;border-top:none;border-left:none;border-bottom:solid windowtex=
+t 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;hei=
+ght:20.0pt'><p class=3DMsoNormal align=3Dcenter style=3D'text-align:center'=
+>6,980,000<o:p></o:p></p></td></tr>=
+
+--16810977020.d7dE98.2563--
+
+--16810977021.D4efd82.2563
+Content-ID: <image002.png@01D960D7.1F4C9CD0>
+Content-Type: image/png; name=image002.png
+Content-Disposition: attachment; filename=image002.png
+Content-Transfer-Encoding: base64
+
+
+--16810977021.D4efd82.2563
+Content-ID: <image004.png@01D960D7.1F4C9CD0>
+Content-Type: image/png; name=image004.png
+Content-Disposition: attachment; filename=image004.png
+Content-Transfer-Encoding: base64
+
+
+--16810977021.D4efd82.2563
+Content-ID: <image006.png@01D960D7.1F4C9CD0>
+Content-Type: image/png; name=image006.png
+Content-Disposition: attachment; filename=image006.png
+Content-Transfer-Encoding: base64
+
+
+--16810977021.D4efd82.2563--
