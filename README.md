@@ -27,6 +27,10 @@ Script Python dùng Claude API (Anthropic) để tự động đọc file hợp 
 
 ## Cài đặt
 
+### 0. Extract file zip (_Tải tại ô Code (Xanh lá cây)_ -> _Ấn "Download Zip"_)
+
+### 0,5. Mở file explore, tại folder 365_crawl_data_main, click chuột ở thanh địa chỉ (hoặc bấm Ctrl + L), Gõ cmd/Powershell và nhấn enter
+
 ### 1. Tạo môi trường ảo (venv)
 
 ```powershell
