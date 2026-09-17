@@ -52,7 +52,8 @@ EXTRACTION_TOOL = {
                         "single": {"type": ["string", "number"], "description": "Giá phòng Single"},
                         "double": {"type": ["string", "number"], "description": "Giá phòng Double"},
                         "extra_bed": {"type": ["string", "number"], "description": "Giá Extra Bed"},
-                        "triple": {"type": ["string", "number"], "description": "Giá phòng Triple"}
+                        "triple": {"type": ["string", "number"], "description": "Giá phòng Triple"},
+                        "quad": {"type": ["string", "number"], "description": "Giá phòng Quad (nếu hợp đồng có)"}
                     },
                     "required": ["hotel_name", "room_type", "from_date", "until_date"]
                 }
@@ -77,6 +78,7 @@ COLUMNS = [
     {"key": "double", "header": "Double", "align": "right", "is_price": True, "header_color": "000000"},
     {"key": "extra_bed", "header": "Extra Bed", "align": "right", "is_price": True, "header_color": "000000"},
     {"key": "triple", "header": "Triple", "align": "right", "is_price": True, "header_color": "000000"},
+    {"key": "quad", "header": "Quad", "align": "right", "is_price": True, "header_color": "000000"},
 ]
 
 def clean_cell_value(val, is_price=False):
@@ -114,7 +116,13 @@ def write_excel(all_rows: list, output_path: Path):
 
     # 2. Ghi dữ liệu từng dòng
     for item in all_rows:
-        row_data = [clean_cell_value(item.get(col["key"]), col["is_price"]) for col in COLUMNS]
+        cleaned = {col["key"]: clean_cell_value(item.get(col["key"]), col["is_price"]) for col in COLUMNS}
+
+        # Nếu hợp đồng không có sẵn giá Triple, suy ra = Double + Extra Bed (khi có đủ 2 giá này)
+        if cleaned["triple"] == "" and isinstance(cleaned["double"], (int, float)) and isinstance(cleaned["extra_bed"], (int, float)):
+            cleaned["triple"] = cleaned["double"] + cleaned["extra_bed"]
+
+        row_data = [cleaned[col["key"]] for col in COLUMNS]
         ws.append(row_data)
 
     # 3. Styling bảng tính
@@ -221,10 +229,12 @@ def process_file(source_file_path: Path, output_file_path: Path, hotel_name_hint
         f"Tên khách sạn gợi ý: '{hotel_name_hint}'.\n"
         "Nhiệm vụ: Trích xuất toàn bộ các dòng giá phòng theo từng mùa/khoảng thời gian vào tool save_contract_rates.\n"
         "Mỗi khoảng thời gian của một loại phòng tạo thành một dòng riêng biệt gồm: "
-        "City, Hotel Name, Room type, Capacity, From, Until, Single, Double, Extra Bed, Triple.\n"
+        "City, Hotel Name, Room type, Capacity, From, Until, Single, Double, Extra Bed, Triple, Quad.\n"
         "Quy tắc dữ liệu:\n"
-        "- Nếu bất kỳ trường nào không có thông tin (như không có giá Extra Bed, Triple, Single...), "
-        "hãy ĐỂ TRỐNG hoặc bỏ qua trường đó. TUYỆT ĐỐI KHÔNG điền 'NA', 'N/A', 'none', hay 'unknown'.\n\n"
+        "- Nếu bất kỳ trường nào không có thông tin (như không có giá Extra Bed, Triple, Quad, Single...), "
+        "hãy ĐỂ TRỐNG hoặc bỏ qua trường đó. TUYỆT ĐỐI KHÔNG điền 'NA', 'N/A', 'none', hay 'unknown'.\n"
+        "- Quad là giá phòng cho 4 người, chỉ một số hợp đồng có mục này — nếu không thấy trong tài liệu thì để trống, "
+        "KHÔNG được tự suy ra hay tính toán giá Quad.\n\n"
         f"--- BẮT ĐẦU TÀI LIỆU ---\n{doc_text}\n--- KẾT THÚC TÀI LIỆU ---"
     )
 
