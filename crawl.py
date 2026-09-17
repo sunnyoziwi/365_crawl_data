@@ -234,7 +234,9 @@ def process_file(source_file_path: Path, output_file_path: Path, hotel_name_hint
         "- Nếu bất kỳ trường nào không có thông tin (như không có giá Extra Bed, Triple, Quad, Single...), "
         "hãy ĐỂ TRỐNG hoặc bỏ qua trường đó. TUYỆT ĐỐI KHÔNG điền 'NA', 'N/A', 'none', hay 'unknown'.\n"
         "- Quad là giá phòng cho 4 người, chỉ một số hợp đồng có mục này — nếu không thấy trong tài liệu thì để trống, "
-        "KHÔNG được tự suy ra hay tính toán giá Quad.\n\n"
+        "KHÔNG được tự suy ra hay tính toán giá Quad.\n"
+        "- Hợp đồng thường có 2 loại giá: FIT (khách lẻ/Free Independent Traveler) và GIT (khách đoàn/Group Inclusive Tour). "
+        "CHỈ trích xuất giá FIT, TUYỆT ĐỐI KHÔNG lấy giá GIT/Group. Nếu tài liệu không ghi rõ FIT/GIT thì coi như bảng giá đó là FIT.\n\n"
         f"--- BẮT ĐẦU TÀI LIỆU ---\n{doc_text}\n--- KẾT THÚC TÀI LIỆU ---"
     )
 
