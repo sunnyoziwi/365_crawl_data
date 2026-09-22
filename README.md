@@ -1,21 +1,23 @@
 # 365 Crawl Data
 
-Script Python dùng Claude API (Anthropic) để tự động đọc file hợp đồng khách sạn (PDF, DOCX, DOC, TXT) và trích xuất thông tin có cấu trúc (tên khách sạn, loại phòng, bảng giá theo mùa, chính sách...) ra file Excel.
+Script Python dùng Claude API (Anthropic) để tự động đọc file hợp đồng khách sạn (PDF, DOCX, DOC, TXT) và trích xuất bảng giá phòng theo mùa ra file Excel với các cột cố định. Có 2 cách dùng: chạy hàng loạt theo thư mục (`crawl.py`) hoặc tải file trực tiếp qua giao diện web (`app.py`, dùng Gradio).
 
 ## Cấu trúc thư mục
 
 ```
 365_crawl_data/
-├── crawl.py            # Script chính
-├── requirements.txt    # Danh sách thư viện cần cài
-├── .env                 # API key (tự tạo, KHÔNG đẩy lên Git)
-├── .env.example         # Mẫu file .env
-├── data/                # Dữ liệu đầu vào (hợp đồng gốc)
+├── crawl.py             # Xử lý hàng loạt theo thư mục data/HOTEL/...
+├── app.py                # Giao diện Gradio: tải file lên, tải file Excel kết quả về
+├── extractor.py          # Logic dùng chung (đọc file, gọi Claude, ghi Excel)
+├── requirements.txt      # Danh sách thư viện cần cài
+├── .env                  # API key (tự tạo, KHÔNG đẩy lên Git)
+├── .env.example          # Mẫu file .env
+├── data/                 # Dữ liệu đầu vào (hợp đồng gốc, dùng cho crawl.py)
 │   └── HOTEL/
 │       └── HANOI/
 │           └── <Tên khách sạn>/
 │               └── ... (file .pdf, .docx, .doc, .txt)
-└── data_result/         # Dữ liệu đầu ra (Excel đã trích xuất) - KHÔNG đẩy lên Git
+└── data_result/          # Dữ liệu đầu ra (Excel đã trích xuất) - KHÔNG đẩy lên Git
 ```
 
 > Thư mục `data_result/` không được đưa lên GitHub (xem `.gitignore`) vì là dữ liệu sinh ra từ script, người dùng nào cũng tự tạo lại được.
@@ -54,7 +56,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 
 Script tự động đọc key từ file `.env` này khi chạy (dùng `python-dotenv`), không cần set biến môi trường Windows thủ công. File `.env` đã được `.gitignore` chặn nên không bao giờ bị đẩy lên Git.
 
-## Cách chạy
+## Cách chạy (1) — Xử lý hàng loạt theo thư mục
 
 ```powershell
 python crawl.py
@@ -63,31 +65,50 @@ python crawl.py
 Script sẽ:
 1. Duyệt qua từng thư mục khách sạn trong `SOURCE_DIR` (mặc định `data/HOTEL/HANOI`)
 2. Đọc toàn bộ file `.pdf`, `.docx`, `.doc`, `.txt` bên trong (kể cả thư mục con)
-3. Gửi nội dung cho Claude để trích xuất thông tin theo schema định sẵn
+3. Gửi nội dung cho Claude để trích xuất bảng giá theo schema định sẵn
 4. Ghi kết quả ra file **Excel (`.xlsx`)** tương ứng vào `OUTPUT_BASE_DIR` (mặc định `data_result/HANOI`), giữ nguyên cấu trúc thư mục
 
 Nếu file Excel kết quả đã tồn tại, script sẽ bỏ qua (không xử lý lại) để tiết kiệm chi phí gọi API.
 
+## Cách chạy (2) — Giao diện web (Gradio)
+
+```powershell
+python app.py
+```
+
+Mở địa chỉ hiện ra trong terminal (mặc định `http://127.0.0.1:7860`), sau đó:
+1. Tải lên một hoặc nhiều file hợp đồng (PDF, DOCX, DOC, TXT)
+2. Bấm **Trích xuất & Tạo Excel**
+3. Tải file Excel gộp kết quả về (tất cả các dòng giá từ mọi file đã tải lên, gộp vào **1 file duy nhất**)
+
+Phù hợp khi cần xử lý nhanh vài file lẻ, không cần sắp xếp vào cấu trúc thư mục `data/HOTEL/...`.
+
 ### Định dạng file Excel kết quả
 
-Mỗi file `.xlsx` có 2 cột **Key / Value**. Các trường lồng nhau trong dữ liệu gốc được làm phẳng (flatten) bằng cách nối tên bằng dấu `_`, phần tử trong danh sách (array) được đánh số bắt đầu từ 0. Ví dụ:
+Mỗi file `.xlsx` có các cột cố định sau, mỗi dòng là 1 loại phòng trong 1 khoảng ngày (mùa giá):
 
-| Key | Value |
-|---|---|
-| hotel_information_hotel_name | Apricot |
-| contract_information_contract_name | Hợp đồng 2024 |
-| room_information_0_room_name | Deluxe |
-| room_information_1_room_name | Suite |
-| policies_raw_text_child_policy_0 | Trẻ dưới 6 tuổi miễn phí |
+| City | Hotel Name | Room type | Capacity | From | Until | Single | Double | Extra Bed | Triple | Quad |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Hanoi | Apricot | Deluxe | 2 | 01-Nov-26 | 03-May-27 | | 1,800,000 | 500,000 | 2,300,000 | |
 
-## Các tuỳ chọn cấu hình (đầu file `crawl.py`)
+Quy tắc trích xuất:
+- Chỉ lấy giá **FIT** (khách lẻ), bỏ qua giá **GIT/Group**.
+- Trường không có dữ liệu sẽ để **trống** (không điền "N/A", "unknown"...).
+- Nếu hợp đồng không có sẵn giá **Triple**, hệ thống tự suy ra = Double + Extra Bed (khi có đủ 2 giá này). Giá **Quad** không bao giờ tự suy ra, chỉ lấy khi hợp đồng ghi rõ.
+
+## Các tuỳ chọn cấu hình (đầu file `extractor.py`)
+
+| Biến | Ý nghĩa | Mặc định |
+|---|---|---|
+| `MODEL_NAME` | Model Claude sử dụng | `claude-haiku-4-5` |
+
+### Tuỳ chọn riêng của `crawl.py` (xử lý hàng loạt)
 
 | Biến | Ý nghĩa | Mặc định |
 |---|---|---|
 | `SOURCE_DIR` | Thư mục chứa dữ liệu gốc cần xử lý | `data/HOTEL/HANOI` |
 | `OUTPUT_BASE_DIR` | Thư mục ghi kết quả Excel | `data_result/HANOI` |
 | `LIMIT_HOTELS` | Giới hạn số khách sạn xử lý (để test). Đặt `None` để chạy toàn bộ | `5` |
-| `MODEL_NAME` | Model Claude sử dụng | `claude-haiku-4-5` |
 
 ## Lưu ý quan trọng
 

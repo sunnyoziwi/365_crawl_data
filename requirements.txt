@@ -3,3 +3,4 @@ pypdf
 python-docx
 python-dotenv
 openpyxl
+gradio
