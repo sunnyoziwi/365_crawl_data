@@ -79,9 +79,37 @@ python app.py
 Mở địa chỉ hiện ra trong terminal (mặc định `http://127.0.0.1:7860`), sau đó:
 1. Tải lên một hoặc nhiều file hợp đồng (PDF, DOCX, DOC, TXT)
 2. Bấm **Trích xuất & Tạo Excel**
-3. Tải file Excel gộp kết quả về (tất cả các dòng giá từ mọi file đã tải lên, gộp vào **1 file duy nhất**)
+3. Tải kết quả về — **mỗi file input trả về 1 file Excel riêng** (cùng tên với file gốc)
 
 Phù hợp khi cần xử lý nhanh vài file lẻ, không cần sắp xếp vào cấu trúc thư mục `data/HOTEL/...`.
+
+### Tự host cho máy khác cùng wifi/LAN truy cập
+
+Mặc định app chỉ chạy ở `127.0.0.1` — chỉ máy đang chạy `python app.py` mới mở được. Để các máy khác **cùng wifi/LAN** cũng vào được:
+
+1. Chạy app với `server_name` mở ra toàn bộ mạng (thay vì chỉ localhost):
+
+   ```powershell
+   # Windows (PowerShell)
+   $env:GRADIO_SERVER_NAME="0.0.0.0"
+   $env:GRADIO_SERVER_PORT="7860"
+   python app.py
+   ```
+
+   ```bash
+   # macOS/Linux
+   GRADIO_SERVER_NAME=0.0.0.0 GRADIO_SERVER_PORT=7860 python app.py
+   ```
+
+2. Lấy IP LAN của máy đang chạy app:
+   - macOS: `ipconfig getifaddr en0` (wifi) hoặc mở System Settings → Wi-Fi → Details
+   - Windows: chạy `ipconfig`, xem dòng **IPv4 Address**
+
+3. Từ máy khác **cùng wifi**, mở trình duyệt vào `http://<IP-LAN-máy-host>:<PORT>`, ví dụ `http://192.168.1.5:7860`
+
+Lưu ý:
+- Cách này chỉ hoạt động cho máy **cùng mạng LAN/wifi**. Máy ở wifi/mạng khác sẽ **không** vào được, vì `192.168.x.x` là IP nội bộ, router không tự chuyển tiếp traffic từ ngoài vào. Muốn máy khác wifi vào được, dùng `demo.launch(share=True)` (Gradio tạo link public tạm qua tunnel của họ) hoặc deploy app lên server/cloud có IP public.
+- Nếu đúng IP mà vẫn không vào được: kiểm tra Firewall của máy host có chặn cổng đó không, hoặc wifi đang bật **Client/AP Isolation** (chặn các thiết bị thấy nhau) — thường gặp ở wifi quán cà phê, khách sạn, mạng khách (guest wifi).
 
 ### Định dạng file Excel kết quả
 
@@ -101,6 +129,13 @@ Quy tắc trích xuất:
 | Biến | Ý nghĩa | Mặc định |
 |---|---|---|
 | `MODEL_NAME` | Model Claude sử dụng | `claude-haiku-4-5` |
+
+### Tuỳ chọn riêng của `app.py` (giao diện Gradio, đặt qua biến môi trường)
+
+| Biến môi trường | Ý nghĩa | Mặc định |
+|---|---|---|
+| `GRADIO_SERVER_NAME` | Địa chỉ IP để lắng nghe. `127.0.0.1` = chỉ máy này; `0.0.0.0` = mở cho cả mạng LAN/wifi | `127.0.0.1` |
+| `GRADIO_SERVER_PORT` | Cổng chạy app | `7860` |
 
 ### Tuỳ chọn riêng của `crawl.py` (xử lý hàng loạt)
 

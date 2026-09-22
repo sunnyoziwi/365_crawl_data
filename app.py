@@ -2,6 +2,7 @@
 trích xuất bảng giá bằng Claude và xuất ra mỗi file input 1 file Excel
 tương ứng (cùng tên), theo bộ cột cố định (xem extractor.COLUMNS).
 """
+import os
 from pathlib import Path
 
 import gradio as gr
@@ -83,4 +84,9 @@ with gr.Blocks(title="Trích xuất bảng giá khách sạn") as demo:
     run_btn.click(fn=process_files, inputs=file_input, outputs=[output_file, log_output])
 
 if __name__ == "__main__":
-    demo.launch()
+    # Mặc định chỉ máy này truy cập được (127.0.0.1). Đặt GRADIO_SERVER_NAME=0.0.0.0
+    # để máy khác cùng mạng LAN/wifi vào được qua IP LAN của máy này (xem README).
+    demo.launch(
+        server_name=os.environ.get("GRADIO_SERVER_NAME", "127.0.0.1"),
+        server_port=int(os.environ.get("GRADIO_SERVER_PORT", "7860")),
+    )
