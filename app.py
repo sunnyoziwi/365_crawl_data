@@ -1,6 +1,6 @@
 """Giao diện Gradio: tải lên nhiều file hợp đồng (PDF/DOCX/DOC/TXT),
-trích xuất bảng giá bằng Claude và xuất ra 1 file Excel duy nhất
-theo bộ cột cố định (xem extractor.COLUMNS).
+trích xuất bảng giá bằng Claude và xuất ra mỗi file input 1 file Excel
+tương ứng (cùng tên), theo bộ cột cố định (xem extractor.COLUMNS).
 """
 from pathlib import Path
 
@@ -19,9 +19,10 @@ def process_files(files, progress=gr.Progress()):
     if not files:
         raise gr.Error("Vui lòng tải lên ít nhất 1 file (PDF, DOCX, DOC, TXT).")
 
-    all_rows = []
-    processed_stems = []
+    output_paths = []
     log_lines = []
+
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     for f in progress.tqdm(files, desc="Đang trích xuất dữ liệu..."):
         path = _file_path(f)
@@ -45,31 +46,23 @@ def process_files(files, progress=gr.Progress()):
             log_lines.append(f"➖ {path.name}: không tìm thấy dòng giá nào.")
             continue
 
-        all_rows.extend(rates)
-        processed_stems.append(path.stem)
-        log_lines.append(f"✅ {path.name}: trích xuất {len(rates)} dòng giá.")
+        output_path = OUTPUT_DIR / f"{path.stem}.xlsx"
+        write_excel(rates, output_path)
+        output_paths.append(str(output_path))
+        log_lines.append(f"✅ {path.name}: trích xuất {len(rates)} dòng giá → {output_path.name}")
 
-    if not all_rows:
+    if not output_paths:
         raise gr.Error("Không trích xuất được dữ liệu nào từ các file đã tải lên.\n\n" + "\n".join(log_lines))
 
-    if len(processed_stems) == 1:
-        output_name = f"{processed_stems[0]}.xlsx"
-    else:
-        output_name = f"{processed_stems[0]}_gop_{len(processed_stems)}_file.xlsx"
-
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT_DIR / output_name
-    write_excel(all_rows, output_path)
-
-    log_lines.append(f"\n🎉 Hoàn thành: {len(all_rows)} dòng giá, {len(files)} file đã xử lý.")
-    return str(output_path), "\n".join(log_lines)
+    log_lines.append(f"\n🎉 Hoàn thành: {len(output_paths)}/{len(files)} file đã xử lý.")
+    return output_paths, "\n".join(log_lines)
 
 
 with gr.Blocks(title="Trích xuất bảng giá khách sạn") as demo:
     gr.Markdown(
         "# 🏨 Trích xuất bảng giá khách sạn → Excel\n"
         "Tải lên một hoặc nhiều file hợp đồng (**PDF, DOCX, DOC, TXT**). "
-        "Claude sẽ đọc và trích xuất bảng giá FIT theo mùa, sau đó gộp vào **1 file Excel** "
+        "Claude sẽ đọc và trích xuất bảng giá FIT theo mùa, mỗi file input trả về **1 file Excel riêng** (cùng tên) "
         "với các cột cố định: City, Hotel Name, Room type, Capacity, From, Until, Single, Double, Extra Bed, Triple, Quad."
     )
 
@@ -83,7 +76,7 @@ with gr.Blocks(title="Trích xuất bảng giá khách sạn") as demo:
     run_btn = gr.Button("Trích xuất & Tạo Excel", variant="primary")
 
     with gr.Row():
-        output_file = gr.File(label="File Excel kết quả")
+        output_file = gr.File(label="File Excel kết quả", file_count="multiple")
 
     log_output = gr.Textbox(label="Nhật ký xử lý", lines=10, interactive=False)
 
