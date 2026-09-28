@@ -63,7 +63,7 @@ with gr.Blocks(title="Trích xuất bảng giá khách sạn") as demo:
     gr.Markdown(
         "# 🏨 Trích xuất bảng giá khách sạn → Excel\n"
         "Tải lên một hoặc nhiều file hợp đồng (**PDF, DOCX, DOC, TXT**). "
-        "Claude sẽ đọc và trích xuất bảng giá FIT theo mùa, mỗi file input trả về **1 file Excel riêng** (cùng tên) "
+        "Hệ thống sẽ đọc và trích xuất bảng giá FIT theo mùa, mỗi file input trả về **1 file Excel riêng** (cùng tên) "
         "với các cột cố định: City, Hotel Name, Room type, Capacity, From, Until, Single, Double, Extra Bed, Triple, Quad."
     )
 
