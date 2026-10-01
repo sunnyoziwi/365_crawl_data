@@ -202,27 +202,18 @@ def read_text_from_file(file_path: Path) -> str:
     return ""
 
 
-def extract_rates(doc_text: str, hotel_name_hint: str = "") -> list:
-    """Gọi Claude để trích xuất danh sách dòng giá từ nội dung văn bản của 1 tài liệu."""
-    prompt = (
-        f"Bạn là chuyên gia trích xuất dữ liệu bảng giá khách sạn.\n"
-        f"Tên khách sạn gợi ý: '{hotel_name_hint}'.\n"
-        "Nhiệm vụ: Trích xuất toàn bộ các dòng giá phòng theo từng mùa/khoảng thời gian vào tool save_contract_rates.\n"
-        "Mỗi khoảng thời gian của một loại phòng tạo thành một dòng riêng biệt gồm: "
-        "City, Hotel Name, Room type, Capacity, From, Until, Single, Double, Extra Bed, Triple, Quad.\n"
-        "Quy tắc dữ liệu:\n"
-        "- Nếu bất kỳ trường nào không có thông tin (như không có giá Extra Bed, Triple, Quad, Single...), "
-        "hãy ĐỂ TRỐNG hoặc bỏ qua trường đó. TUYỆT ĐỐI KHÔNG điền 'NA', 'N/A', 'none', hay 'unknown'.\n"
-        "- Quad là giá phòng cho 4 người, chỉ một số hợp đồng có mục này — nếu không thấy trong tài liệu thì để trống, "
-        "KHÔNG được tự suy ra hay tính toán giá Quad.\n"
-        "- Hợp đồng thường có 2 loại giá: FIT (khách lẻ/Free Independent Traveler) và GIT (khách đoàn/Group Inclusive Tour). "
-        "CHỈ trích xuất giá FIT, TUYỆT ĐỐI KHÔNG lấy giá GIT/Group. Nếu tài liệu không ghi rõ FIT/GIT thì coi như bảng giá đó là FIT.\n\n"
-        f"--- BẮT ĐẦU TÀI LIỆU ---\n{doc_text}\n--- KẾT THÚC TÀI LIỆU ---"
-    )
+COMMON_RULES = (
+    "- Nếu bất kỳ trường nào không có thông tin, hãy ĐỂ TRỐNG hoặc bỏ qua trường đó. "
+    "TUYỆT ĐỐI KHÔNG điền 'NA', 'N/A', 'none', hay 'unknown'.\n"
+    "- Hợp đồng thường có 2 loại giá: FIT (khách lẻ/Free Independent Traveler) và GIT (khách đoàn/Group Inclusive Tour). "
+    "CHỈ trích xuất giá FIT, TUYỆT ĐỐI KHÔNG lấy giá GIT/Group. Nếu tài liệu không ghi rõ FIT/GIT thì coi như bảng giá đó là FIT.\n"
+)
 
+
+def _call_extraction(prompt: str) -> list:
     response = get_client().messages.create(
         model=MODEL_NAME,
-        max_tokens=4096,
+        max_tokens=16000,
         tools=[EXTRACTION_TOOL],
         tool_choice={"type": "tool", "name": "save_contract_rates"},
         messages=[{"role": "user", "content": prompt}],
@@ -230,5 +221,43 @@ def extract_rates(doc_text: str, hotel_name_hint: str = "") -> list:
 
     for block in response.content:
         if block.type == "tool_use" and block.name == "save_contract_rates":
-            return block.input.get("rates", [])
+            rates = block.input.get("rates", [])
+            if response.stop_reason == "max_tokens" and not rates:
+                raise RuntimeError(
+                    "Phản hồi của Claude bị cắt do vượt giới hạn max_tokens (hợp đồng quá dài/nhiều dòng giá)."
+                )
+            return rates
     return []
+
+
+def _build_prompt(doc_text: str, hotel_name_hint: str, extra_rule: str = "") -> str:
+    return (
+        f"Bạn là chuyên gia trích xuất dữ liệu bảng giá khách sạn.\n"
+        f"Tên khách sạn gợi ý: '{hotel_name_hint}'.\n"
+        "Nhiệm vụ: Trích xuất toàn bộ các dòng giá phòng theo từng mùa/khoảng thời gian vào tool save_contract_rates.\n"
+        "Mỗi khoảng thời gian của một loại phòng tạo thành một dòng riêng biệt gồm: "
+        "City, Hotel Name, Room type, Capacity, From, Until, Single, Double, Extra Bed, Triple, Quad.\n"
+        "Quy tắc dữ liệu:\n"
+        f"{COMMON_RULES}"
+        "- Quad là giá phòng cho 4 người, chỉ một số hợp đồng có mục này — nếu không thấy trong tài liệu thì để trống, "
+        "KHÔNG được tự suy ra hay tính toán giá Quad.\n"
+        f"{extra_rule}\n"
+        f"--- BẮT ĐẦU TÀI LIỆU ---\n{doc_text}\n--- KẾT THÚC TÀI LIỆU ---"
+    )
+
+
+def extract_rates(doc_text: str, hotel_name_hint: str = "") -> list:
+    """Gọi Claude để trích xuất bảng giá PHÒNG KHÁCH SẠN (tính theo occupancy: Single/Double/Triple...)."""
+    return _call_extraction(_build_prompt(doc_text, hotel_name_hint))
+
+
+def extract_villa_rates(doc_text: str, hotel_name_hint: str = "") -> list:
+    """Giống hệt extract_rates, chỉ thêm đúng 1 rule: villa từ 2 phòng ngủ trở lên -> chỉ điền cột Quad."""
+    extra_rule = (
+        "- QUAN TRỌNG - xét RIÊNG TỪNG DÒNG (từng room_type), KHÔNG áp dụng chung cho cả tài liệu: "
+        "CHỈ khi TÊN loại villa của DÒNG ĐÓ ghi rõ số phòng ngủ từ 2 trở lên (vd tên chứa '2 Bedroom', '3-Bedroom', "
+        "'Four-bedrooms', '2BR'...) thì dòng đó mới điền giá vào cột 'quad' và để TRỐNG 'single', 'double', 'extra_bed', 'triple'. "
+        "TẤT CẢ CÁC DÒNG KHÁC (tên không chứa số phòng ngủ, ví dụ 'Beach Front Villa', 'Pool Villa', 'Garden Villa'...) "
+        "PHẢI điền giá như bình thường (single/double/extra_bed/triple theo đúng dữ liệu trong tài liệu), TUYỆT ĐỐI KHÔNG điền vào 'quad'.\n"
+    )
+    return _call_extraction(_build_prompt(doc_text, hotel_name_hint, extra_rule))
