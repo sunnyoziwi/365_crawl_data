@@ -100,9 +100,9 @@ with gr.Blocks(title="Trích xuất bảng giá khách sạn") as demo:
 
         with gr.Tab("🏡 Villa"):
             gr.Markdown(
-                "Villa thuê nguyên căn, tính 1 giá/đêm — không tách theo occupancy:\n"
-                "- Villa **studio / 1 phòng ngủ** → giá vào cột **Double**\n"
-                "- Villa **từ 2 phòng ngủ trở lên** → giá vào cột **Quad**"
+                "Giống hệt tab Khách sạn, chỉ thêm 1 rule: villa có tên ghi rõ **từ 2 phòng ngủ trở lên** "
+                "(vd '2 Bedroom', 'Four-bedrooms') → giá chỉ điền vào cột **Quad**. "
+                "Villa khác (không ghi rõ số phòng ngủ) được trích xuất bình thường như 1 phòng khách sạn."
             )
             _build_tab(process_villa_files)
 
