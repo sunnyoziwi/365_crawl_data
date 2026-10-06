@@ -237,21 +237,24 @@ def _call_extraction(file_path: Path, content) -> list:
     )
     if is_pdf:
         # Thinking không tương thích với tool_choice ép buộc -> để "auto" và dặn rõ trong prompt phải gọi tool.
+        # max_tokens cao (hợp đồng dài + rule villa dài hơn có thể cần nhiều token thinking+output) nên phải
+        # dùng streaming, API không cho gọi non-streaming khi ước tính thời gian xử lý có thể vượt 10 phút.
         kwargs.update(
             model=PDF_MODEL_NAME,
-            max_tokens=20000,
+            max_tokens=50000,
             thinking={"type": "adaptive"},
             output_config={"effort": "high"},
             tool_choice={"type": "auto"},
         )
+        with get_client().messages.stream(**kwargs) as stream:
+            response = stream.get_final_message()
     else:
         kwargs.update(
             model=MODEL_NAME,
             max_tokens=16000,
             tool_choice={"type": "tool", "name": "save_contract_rates"},
         )
-
-    response = get_client().messages.create(**kwargs)
+        response = get_client().messages.create(**kwargs)
 
     for block in response.content:
         if block.type == "tool_use" and block.name == "save_contract_rates":
