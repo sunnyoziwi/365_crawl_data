@@ -8,7 +8,7 @@ from pathlib import Path
 
 import docx
 import openpyxl
-import pypdf
+import pdfplumber
 from anthropic import Anthropic
 from dotenv import load_dotenv
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
@@ -18,6 +18,10 @@ load_dotenv()
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 MODEL_NAME = "claude-haiku-4-5"
+# PDF dùng model mạnh hơn + extended thinking: bảng giá PDF hay có cột mùa giá
+# lệch số dòng (vd High season nhiều khoảng ngày hơn Low/Peak), Haiku hay khớp nhầm
+# ngày với cột giá. Test thực tế: Haiku sai ~1/10 dòng, Sonnet+thinking đúng 10/10.
+PDF_MODEL_NAME = "claude-sonnet-5"
 VALID_EXTS = {".pdf", ".docx", ".doc", ".txt"}
 
 _client = None
@@ -169,6 +173,18 @@ def write_excel(all_rows: list, output_path: Path):
     wb.save(output_path)
 
 
+def read_pdf_layout_text(file_path: Path) -> str:
+    """Bóc text PDF bằng pdfplumber, giữ nguyên vị trí cột qua khoảng trắng (extract_text layout=True).
+    Giữ đúng cấu trúc bảng hơn nhiều so với pypdf (vốn đọc text theo thứ tự lưu trong file,
+    làm xáo trộn thứ tự các cột khi bảng có nhiều cột giá theo mùa)."""
+    try:
+        with pdfplumber.open(file_path) as pdf:
+            return "\n".join((page.extract_text(layout=True) or "") for page in pdf.pages)
+    except Exception as e:
+        print(f"      [!] Lỗi mở pdf: {e}")
+        return ""
+
+
 def read_text_from_file(file_path: Path) -> str:
     ext = file_path.suffix.lower()
     if ext == ".txt":
@@ -186,12 +202,7 @@ def read_text_from_file(file_path: Path) -> str:
             print(f"      [!] Lỗi mở docx: {e}")
             return ""
     elif ext == ".pdf":
-        try:
-            reader = pypdf.PdfReader(str(file_path))
-            return "\n".join([page.extract_text() or "" for page in reader.pages])
-        except Exception as e:
-            print(f"      [!] Lỗi mở pdf: {e}")
-            return ""
+        return read_pdf_layout_text(file_path)
     elif ext == ".doc":
         try:
             with open(file_path, "rb") as f:
@@ -210,14 +221,37 @@ COMMON_RULES = (
 )
 
 
-def _call_extraction(prompt: str) -> list:
-    response = get_client().messages.create(
-        model=MODEL_NAME,
-        max_tokens=16000,
+PDF_THINKING_INSTRUCTION = (
+    "\nTài liệu này có thể chứa bảng giá nhiều cột mùa (season) với số khoảng ngày không đều nhau giữa các cột "
+    "(vd cột High season có 4 khoảng ngày trong khi Low/Peak chỉ có 3). "
+    "Hãy suy nghĩ kỹ từng dòng giá, đặc biệt chú ý khớp đúng khoảng ngày với đúng cột mùa giá, trước khi gọi tool.\n"
+)
+
+
+def _call_extraction(file_path: Path, content) -> list:
+    is_pdf = file_path.suffix.lower() == ".pdf"
+
+    kwargs = dict(
         tools=[EXTRACTION_TOOL],
-        tool_choice={"type": "tool", "name": "save_contract_rates"},
-        messages=[{"role": "user", "content": prompt}],
+        messages=[{"role": "user", "content": content}],
     )
+    if is_pdf:
+        # Thinking không tương thích với tool_choice ép buộc -> để "auto" và dặn rõ trong prompt phải gọi tool.
+        kwargs.update(
+            model=PDF_MODEL_NAME,
+            max_tokens=20000,
+            thinking={"type": "adaptive"},
+            output_config={"effort": "high"},
+            tool_choice={"type": "auto"},
+        )
+    else:
+        kwargs.update(
+            model=MODEL_NAME,
+            max_tokens=16000,
+            tool_choice={"type": "tool", "name": "save_contract_rates"},
+        )
+
+    response = get_client().messages.create(**kwargs)
 
     for block in response.content:
         if block.type == "tool_use" and block.name == "save_contract_rates":
@@ -230,7 +264,8 @@ def _call_extraction(prompt: str) -> list:
     return []
 
 
-def _build_prompt(doc_text: str, hotel_name_hint: str, extra_rule: str = "") -> str:
+def _build_prompt(file_path: Path, hotel_name_hint: str, extra_rule: str = "") -> str:
+    pdf_note = PDF_THINKING_INSTRUCTION if file_path.suffix.lower() == ".pdf" else ""
     return (
         f"Bạn là chuyên gia trích xuất dữ liệu bảng giá khách sạn.\n"
         f"Tên khách sạn gợi ý: '{hotel_name_hint}'.\n"
@@ -241,17 +276,23 @@ def _build_prompt(doc_text: str, hotel_name_hint: str, extra_rule: str = "") -> 
         f"{COMMON_RULES}"
         "- Quad là giá phòng cho 4 người, chỉ một số hợp đồng có mục này — nếu không thấy trong tài liệu thì để trống, "
         "KHÔNG được tự suy ra hay tính toán giá Quad.\n"
-        f"{extra_rule}\n"
-        f"--- BẮT ĐẦU TÀI LIỆU ---\n{doc_text}\n--- KẾT THÚC TÀI LIỆU ---"
+        f"{extra_rule}"
+        f"{pdf_note}"
     )
 
 
-def extract_rates(doc_text: str, hotel_name_hint: str = "") -> list:
+def _build_content(file_path: Path, prompt: str) -> str:
+    doc_text = read_text_from_file(file_path)
+    return f"{prompt}\n\n--- BẮT ĐẦU TÀI LIỆU ---\n{doc_text}\n--- KẾT THÚC TÀI LIỆU ---"
+
+
+def extract_rates(file_path: Path, hotel_name_hint: str = "") -> list:
     """Gọi Claude để trích xuất bảng giá PHÒNG KHÁCH SẠN (tính theo occupancy: Single/Double/Triple...)."""
-    return _call_extraction(_build_prompt(doc_text, hotel_name_hint))
+    prompt = _build_prompt(file_path, hotel_name_hint)
+    return _call_extraction(file_path, _build_content(file_path, prompt))
 
 
-def extract_villa_rates(doc_text: str, hotel_name_hint: str = "") -> list:
+def extract_villa_rates(file_path: Path, hotel_name_hint: str = "") -> list:
     """Giống hệt extract_rates, chỉ thêm đúng 1 rule: villa từ 2 phòng ngủ trở lên -> chỉ điền cột Quad."""
     extra_rule = (
         "- QUAN TRỌNG - xét RIÊNG TỪNG DÒNG (từng room_type), KHÔNG áp dụng chung cho cả tài liệu: "
@@ -260,4 +301,5 @@ def extract_villa_rates(doc_text: str, hotel_name_hint: str = "") -> list:
         "TẤT CẢ CÁC DÒNG KHÁC (tên không chứa số phòng ngủ, ví dụ 'Beach Front Villa', 'Pool Villa', 'Garden Villa'...) "
         "PHẢI điền giá như bình thường (single/double/extra_bed/triple theo đúng dữ liệu trong tài liệu), TUYỆT ĐỐI KHÔNG điền vào 'quad'.\n"
     )
-    return _call_extraction(_build_prompt(doc_text, hotel_name_hint, extra_rule))
+    prompt = _build_prompt(file_path, hotel_name_hint, extra_rule)
+    return _call_extraction(file_path, _build_content(file_path, prompt))

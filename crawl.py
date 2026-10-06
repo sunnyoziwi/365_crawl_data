@@ -18,13 +18,12 @@ def process_file(source_file_path: Path, output_file_path: Path, hotel_name_hint
         print(f"      [SKIP] Đã tồn tại: {output_file_path.name}")
         return
 
-    doc_text = read_text_from_file(source_file_path)
-    if not doc_text.strip():
+    if not read_text_from_file(source_file_path).strip():
         print(f"      [!] Không bóc tách được văn bản: {source_file_path.name}")
         return
 
     try:
-        rates = extract_rates(doc_text, hotel_name_hint)
+        rates = extract_rates(source_file_path, hotel_name_hint)
         if rates:
             write_excel(rates, output_file_path)
             print(f"      [✓] Hoàn thành: {output_file_path.name}")

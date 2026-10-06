@@ -35,13 +35,12 @@ def _process(files, extract_fn, progress):
             log_lines.append(f"⏭️ {path.name}: định dạng không được hỗ trợ, bỏ qua.")
             continue
 
-        text = read_text_from_file(path)
-        if not text.strip():
+        if not read_text_from_file(path).strip():
             log_lines.append(f"⚠️ {path.name}: không đọc được nội dung văn bản.")
             continue
 
         try:
-            rates = extract_fn(text, hotel_name_hint=path.stem)
+            rates = extract_fn(path, hotel_name_hint=path.stem)
         except Exception as e:
             log_lines.append(f"❌ {path.name}: lỗi khi gọi Claude API ({e}).")
             continue
@@ -111,5 +110,5 @@ if __name__ == "__main__":
     # để máy khác cùng mạng LAN/wifi vào được qua IP LAN của máy này (xem README).
     demo.launch(
         server_name=os.environ.get("GRADIO_SERVER_NAME", "127.0.0.1"),
-        server_port=int(os.environ.get("GRADIO_SERVER_PORT", "7860")),
+        server_port=int(os.environ.get("GRADIO_SERVER_PORT", "7861")),
     )
