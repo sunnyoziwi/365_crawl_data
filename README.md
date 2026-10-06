@@ -1,20 +1,19 @@
 # 365 Crawl Data
 
-Script Python dùng Claude API (Anthropic) để tự động đọc file hợp đồng khách sạn (PDF, DOCX, DOC, TXT) và trích xuất bảng giá phòng theo mùa ra file Excel với các cột cố định. Có 2 cách dùng: chạy hàng loạt theo thư mục (`crawl.py`) hoặc tải file trực tiếp qua giao diện web (`app.py`, dùng Gradio).
+Giao diện web (Gradio) dùng Claude API (Anthropic) để tự động đọc file hợp đồng khách sạn (PDF, DOCX, DOC, TXT) và trích xuất bảng giá phòng theo mùa ra file Excel với các cột cố định. Có 2 tab: **Khách sạn** (giá theo occupancy Single/Double/Triple...) và **Villa** (giá nguyên căn/đêm, villa ghi rõ từ 2 phòng ngủ trở lên chỉ điền vào cột Quad).
 
 ## Cấu trúc thư mục
 
 ```
 365_crawl_data/
-├── crawl.py             # Xử lý hàng loạt theo thư mục data/HOTEL/...
 ├── app.py                # Giao diện Gradio: tải file lên, tải file Excel kết quả về
 ├── extractor.py          # Logic dùng chung (đọc file, gọi Claude, ghi Excel)
 ├── requirements.txt      # Danh sách thư viện cần cài
 ├── .env                  # API key (tự tạo, KHÔNG đẩy lên Git)
 ├── .env.example          # Mẫu file .env
-├── data/                 # Dữ liệu đầu vào (hợp đồng gốc, dùng cho crawl.py)
+├── data/                 # Dữ liệu hợp đồng gốc lưu trữ (không bắt buộc, chỉ để tham khảo)
 │   └── HOTEL/
-│       └── HANOI/
+│       └── <Thành phố>/
 │           └── <Tên khách sạn>/
 │               └── ... (file .pdf, .docx, .doc, .txt)
 └── data_result/          # Dữ liệu đầu ra (Excel đã trích xuất) - KHÔNG đẩy lên Git
@@ -56,32 +55,17 @@ ANTHROPIC_API_KEY=sk-ant-...
 
 Script tự động đọc key từ file `.env` này khi chạy (dùng `python-dotenv`), không cần set biến môi trường Windows thủ công. File `.env` đã được `.gitignore` chặn nên không bao giờ bị đẩy lên Git.
 
-## Cách chạy (1) — Xử lý hàng loạt theo thư mục
-
-```powershell
-python crawl.py
-```
-
-Script sẽ:
-1. Duyệt qua từng thư mục khách sạn trong `SOURCE_DIR` (mặc định `data/HOTEL/HANOI`)
-2. Đọc toàn bộ file `.pdf`, `.docx`, `.doc`, `.txt` bên trong (kể cả thư mục con)
-3. Gửi nội dung cho Claude để trích xuất bảng giá theo schema định sẵn
-4. Ghi kết quả ra file **Excel (`.xlsx`)** tương ứng vào `OUTPUT_BASE_DIR` (mặc định `data_result/HANOI`), giữ nguyên cấu trúc thư mục
-
-Nếu file Excel kết quả đã tồn tại, script sẽ bỏ qua (không xử lý lại) để tiết kiệm chi phí gọi API.
-
-## Cách chạy (2) — Giao diện web (Gradio)
+## Cách chạy
 
 ```powershell
 python app.py
 ```
 
 Mở địa chỉ hiện ra trong terminal (mặc định `http://127.0.0.1:7860`), sau đó:
-1. Tải lên một hoặc nhiều file hợp đồng (PDF, DOCX, DOC, TXT)
-2. Bấm **Trích xuất & Tạo Excel**
-3. Tải kết quả về — **mỗi file input trả về 1 file Excel riêng** (cùng tên với file gốc)
-
-Phù hợp khi cần xử lý nhanh vài file lẻ, không cần sắp xếp vào cấu trúc thư mục `data/HOTEL/...`.
+1. Chọn tab **🏨 Khách sạn** hoặc **🏡 Villa** tuỳ loại hợp đồng
+2. Tải lên một hoặc nhiều file hợp đồng (PDF, DOCX, DOC, TXT)
+3. Bấm **Trích xuất & Tạo Excel**
+4. Tải kết quả về — **mỗi file input trả về 1 file Excel riêng** (cùng tên với file gốc)
 
 ### Tự host cho máy khác cùng wifi/LAN truy cập
 
@@ -124,26 +108,18 @@ Quy tắc trích xuất:
 - Trường không có dữ liệu sẽ để **trống** (không điền "N/A", "unknown"...).
 - Nếu hợp đồng không có sẵn giá **Triple**, hệ thống tự suy ra = Double + Extra Bed (khi có đủ 2 giá này). Giá **Quad** không bao giờ tự suy ra, chỉ lấy khi hợp đồng ghi rõ.
 
-## Các tuỳ chọn cấu hình (đầu file `extractor.py`)
+## Model sử dụng
 
-| Biến | Ý nghĩa | Mặc định |
-|---|---|---|
-| `MODEL_NAME` | Model Claude sử dụng | `claude-haiku-4-5` |
+File `.docx` bóc text bằng `python-docx` (giữ đúng cấu trúc bảng gốc), `.doc`/`.txt` đọc trực tiếp — rồi gửi cho **`claude-haiku-4-5`**.
 
-### Tuỳ chọn riêng của `app.py` (giao diện Gradio, đặt qua biến môi trường)
+File `.pdf` bóc text bằng `pdfplumber` (`extract_text(layout=True)`, giữ đúng vị trí cột bằng khoảng trắng — nhiều hợp đồng PDF có bảng giá nhiều cột mùa lệch số dòng, pypdf thường đọc xáo trộn thứ tự cột) rồi gửi cho **`claude-sonnet-5`** kèm extended thinking (`effort=high`). Test thực tế: Haiku sai ~1/10 dòng với bảng giá lệch cột, Sonnet+thinking đúng 10/10 — đổi lại chi phí/lần gọi cao hơn đáng kể so với Haiku.
+
+### Tuỳ chọn của `app.py` (đặt qua biến môi trường)
 
 | Biến môi trường | Ý nghĩa | Mặc định |
 |---|---|---|
 | `GRADIO_SERVER_NAME` | Địa chỉ IP để lắng nghe. `127.0.0.1` = chỉ máy này; `0.0.0.0` = mở cho cả mạng LAN/wifi | `127.0.0.1` |
 | `GRADIO_SERVER_PORT` | Cổng chạy app | `7860` |
-
-### Tuỳ chọn riêng của `crawl.py` (xử lý hàng loạt)
-
-| Biến | Ý nghĩa | Mặc định |
-|---|---|---|
-| `SOURCE_DIR` | Thư mục chứa dữ liệu gốc cần xử lý | `data/HOTEL/HANOI` |
-| `OUTPUT_BASE_DIR` | Thư mục ghi kết quả Excel | `data_result/HANOI` |
-| `LIMIT_HOTELS` | Giới hạn số khách sạn xử lý (để test). Đặt `None` để chạy toàn bộ | `5` |
 
 ## Lưu ý quan trọng
 

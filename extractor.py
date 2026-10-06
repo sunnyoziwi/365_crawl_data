@@ -1,6 +1,6 @@
 """Logic dùng chung: đọc file hợp đồng, gọi Claude trích xuất bảng giá, ghi Excel.
 
-Được dùng bởi cả crawl.py (xử lý hàng loạt theo thư mục) và app.py (giao diện Gradio).
+Được dùng bởi app.py (giao diện Gradio).
 """
 import os
 import re
