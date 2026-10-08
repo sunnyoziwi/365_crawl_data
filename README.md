@@ -1,6 +1,6 @@
 # 365 Crawl Data
 
-Giao diện web (Gradio) dùng Claude API (Anthropic) để tự động đọc file hợp đồng khách sạn (PDF, DOCX, DOC, TXT) và trích xuất bảng giá phòng theo mùa ra file Excel với các cột cố định. Có 2 tab: **Khách sạn** (giá theo occupancy Single/Double/Triple...) và **Villa** (giá nguyên căn/đêm, villa ghi rõ từ 2 phòng ngủ trở lên chỉ điền vào cột Quad).
+Giao diện web (Gradio) dùng Claude API (Anthropic) để tự động đọc file hợp đồng khách sạn (PDF, DOCX, DOC, TXT) và trích xuất bảng giá phòng theo mùa ra file Excel với các cột cố định. Khách sạn và villa dùng chung 1 logic: chỉ villa ghi rõ từ 2 phòng ngủ trở lên mới điền giá vào cột Quad, các phòng khác (kể cả phòng khách sạn) điền theo occupancy (Single/Double/Triple/Quad).
 
 ## Cấu trúc thư mục
 
@@ -62,10 +62,9 @@ python app.py
 ```
 
 Mở địa chỉ hiện ra trong terminal (mặc định `http://127.0.0.1:7860`), sau đó:
-1. Chọn tab **🏨 Khách sạn** hoặc **🏡 Villa** tuỳ loại hợp đồng
-2. Tải lên một hoặc nhiều file hợp đồng (PDF, DOCX, DOC, TXT)
-3. Bấm **Trích xuất & Tạo Excel**
-4. Tải kết quả về — **mỗi file input trả về 1 file Excel riêng** (cùng tên với file gốc)
+1. Tải lên một hoặc nhiều file hợp đồng (PDF, DOCX, DOC, TXT)
+2. Bấm **Trích xuất & Tạo Excel**
+3. Tải kết quả về — **mỗi file input trả về 1 file Excel riêng** (cùng tên với file gốc)
 
 ### Tự host cho máy khác cùng wifi/LAN truy cập
 

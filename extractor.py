@@ -122,6 +122,13 @@ def write_excel(all_rows: list, output_path: Path):
     for item in all_rows:
         cleaned = {col["key"]: clean_cell_value(item.get(col["key"]), col["is_price"]) for col in COLUMNS}
 
+        # Single và Double luôn bằng nhau: ưu tiên giá Double, nếu chỉ có Single thì Double lấy theo Single.
+        # Villa từ 2 phòng ngủ trở lên chỉ có giá Quad (Single/Double trống) nên không bị ảnh hưởng.
+        if isinstance(cleaned["double"], (int, float)):
+            cleaned["single"] = cleaned["double"]
+        elif isinstance(cleaned["single"], (int, float)):
+            cleaned["double"] = cleaned["single"]
+
         # Nếu hợp đồng không có sẵn giá Triple, suy ra = Double + Extra Bed (khi có đủ 2 giá này)
         if cleaned["triple"] == "" and isinstance(cleaned["double"], (int, float)) and isinstance(cleaned["extra_bed"], (int, float)):
             cleaned["triple"] = cleaned["double"] + cleaned["extra_bed"]
@@ -213,11 +220,23 @@ def read_text_from_file(file_path: Path) -> str:
     return ""
 
 
-COMMON_RULES = (
+# Logic gốc, áp dụng cho mọi phòng (khách sạn và villa).
+HOTEL_RULES = (
     "- Nếu bất kỳ trường nào không có thông tin, hãy ĐỂ TRỐNG hoặc bỏ qua trường đó. "
     "TUYỆT ĐỐI KHÔNG điền 'NA', 'N/A', 'none', hay 'unknown'.\n"
     "- Hợp đồng thường có 2 loại giá: FIT (khách lẻ/Free Independent Traveler) và GIT (khách đoàn/Group Inclusive Tour). "
     "CHỈ trích xuất giá FIT, TUYỆT ĐỐI KHÔNG lấy giá GIT/Group. Nếu tài liệu không ghi rõ FIT/GIT thì coi như bảng giá đó là FIT.\n"
+    "- Cột double là giá phòng cho 2 người. Cột single luôn lấy BẰNG giá double (giá 2 người), "
+    "KHÔNG dùng giá 1 người trong hợp đồng.\n"
+    "- Quad là giá phòng cho 4 người, chỉ một số hợp đồng có mục này — nếu không thấy trong tài liệu thì để trống, "
+    "KHÔNG được tự suy ra hay tính toán giá Quad.\n"
+)
+
+# Ngoại lệ duy nhất cho villa, xét từng dòng: villa từ 2 phòng ngủ trở lên bán nguyên căn -> chỉ điền cột Quad.
+VILLA_RULES = (
+    "- Villa có TÊN ghi rõ số phòng ngủ từ 2 trở lên (vd 'Two-Bedroom Pool Villa', '3-Bedroom Villa', '2BR Villa'...): "
+    "giá nguyên căn CHỈ điền vào cột 'quad', để TRỐNG 'single', 'double', 'extra_bed', 'triple'.\n"
+    "- Các villa còn lại (vd 'King Pool Villa', 'Beach Villa'...): áp dụng đúng quy tắc khách sạn ở trên.\n"
 )
 
 
@@ -267,7 +286,7 @@ def _call_extraction(file_path: Path, content) -> list:
     return []
 
 
-def _build_prompt(file_path: Path, hotel_name_hint: str, extra_rule: str = "") -> str:
+def _build_prompt(file_path: Path, hotel_name_hint: str) -> str:
     pdf_note = PDF_THINKING_INSTRUCTION if file_path.suffix.lower() == ".pdf" else ""
     return (
         f"Bạn là chuyên gia trích xuất dữ liệu bảng giá khách sạn.\n"
@@ -275,11 +294,10 @@ def _build_prompt(file_path: Path, hotel_name_hint: str, extra_rule: str = "") -
         "Nhiệm vụ: Trích xuất toàn bộ các dòng giá phòng theo từng mùa/khoảng thời gian vào tool save_contract_rates.\n"
         "Mỗi khoảng thời gian của một loại phòng tạo thành một dòng riêng biệt gồm: "
         "City, Hotel Name, Room type, Capacity, From, Until, Single, Double, Extra Bed, Triple, Quad.\n"
-        "Quy tắc dữ liệu:\n"
-        f"{COMMON_RULES}"
-        "- Quad là giá phòng cho 4 người, chỉ một số hợp đồng có mục này — nếu không thấy trong tài liệu thì để trống, "
-        "KHÔNG được tự suy ra hay tính toán giá Quad.\n"
-        f"{extra_rule}"
+        "Quy tắc khách sạn (áp dụng cho mọi phòng):\n"
+        f"{HOTEL_RULES}"
+        "Quy tắc villa (xét riêng từng dòng):\n"
+        f"{VILLA_RULES}"
         f"{pdf_note}"
     )
 
@@ -290,19 +308,6 @@ def _build_content(file_path: Path, prompt: str) -> str:
 
 
 def extract_rates(file_path: Path, hotel_name_hint: str = "") -> list:
-    """Gọi Claude để trích xuất bảng giá PHÒNG KHÁCH SẠN (tính theo occupancy: Single/Double/Triple...)."""
+    """Gọi Claude để trích xuất bảng giá (khách sạn hay villa đều dùng chung 1 logic)."""
     prompt = _build_prompt(file_path, hotel_name_hint)
-    return _call_extraction(file_path, _build_content(file_path, prompt))
-
-
-def extract_villa_rates(file_path: Path, hotel_name_hint: str = "") -> list:
-    """Giống hệt extract_rates, chỉ thêm đúng 1 rule: villa từ 2 phòng ngủ trở lên -> chỉ điền cột Quad."""
-    extra_rule = (
-        "- QUAN TRỌNG - xét RIÊNG TỪNG DÒNG (từng room_type), KHÔNG áp dụng chung cho cả tài liệu: "
-        "CHỈ khi TÊN loại villa của DÒNG ĐÓ ghi rõ số phòng ngủ từ 2 trở lên (vd tên chứa '2 Bedroom', '3-Bedroom', "
-        "'Four-bedrooms', '2BR'...) thì dòng đó mới điền giá vào cột 'quad' và để TRỐNG 'single', 'double', 'extra_bed', 'triple'. "
-        "TẤT CẢ CÁC DÒNG KHÁC (tên không chứa số phòng ngủ, ví dụ 'Beach Front Villa', 'Pool Villa', 'Garden Villa'...) "
-        "PHẢI điền giá như bình thường (single/double/extra_bed/triple theo đúng dữ liệu trong tài liệu), TUYỆT ĐỐI KHÔNG điền vào 'quad'.\n"
-    )
-    prompt = _build_prompt(file_path, hotel_name_hint, extra_rule)
     return _call_extraction(file_path, _build_content(file_path, prompt))

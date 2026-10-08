@@ -2,15 +2,15 @@
 trích xuất bảng giá bằng Claude và xuất ra mỗi file input 1 file Excel
 tương ứng (cùng tên), theo bộ cột cố định (xem extractor.COLUMNS).
 
-Có 2 tab: Khách sạn (giá theo occupancy) và Villa (giá nguyên căn/đêm,
-villa từ 2 phòng ngủ trở lên chỉ điền vào cột Quad).
+Khách sạn và villa dùng chung 1 logic: chỉ villa từ 2 phòng ngủ trở lên
+mới điền giá vào cột Quad, các phòng khác điền theo occupancy.
 """
 import os
 from pathlib import Path
 
 import gradio as gr
 
-from extractor import VALID_EXTS, extract_rates, extract_villa_rates, read_text_from_file, write_excel
+from extractor import VALID_EXTS, extract_rates, read_text_from_file, write_excel
 
 OUTPUT_DIR = Path("data_result/gradio")
 
@@ -19,7 +19,7 @@ def _file_path(f) -> Path:
     return Path(f if isinstance(f, str) else f.name)
 
 
-def _process(files, extract_fn, progress):
+def process_files(files, progress=gr.Progress()):
     if not files:
         raise gr.Error("Vui lòng tải lên ít nhất 1 file (PDF, DOCX, DOC, TXT).")
 
@@ -40,7 +40,7 @@ def _process(files, extract_fn, progress):
             continue
 
         try:
-            rates = extract_fn(path, hotel_name_hint=path.stem)
+            rates = extract_rates(path, hotel_name_hint=path.stem)
         except Exception as e:
             log_lines.append(f"❌ {path.name}: lỗi khi gọi Claude API ({e}).")
             continue
@@ -61,15 +61,21 @@ def _process(files, extract_fn, progress):
     return output_paths, "\n".join(log_lines)
 
 
-def process_hotel_files(files, progress=gr.Progress()):
-    return _process(files, extract_rates, progress)
+with gr.Blocks(title="Trích xuất bảng giá khách sạn") as demo:
+    gr.Markdown(
+        "# 🏨 Trích xuất bảng giá → Excel\n"
+        "- File hỗ trợ: **PDF, DOCX, DOC, TXT**, mỗi file trả về **1 file Excel** cùng tên\n\n"
+        "**🏨 Rule khách sạn** (áp dụng cho mọi phòng)\n"
+        "- Chỉ lấy giá **FIT**, bỏ giá GIT/Group\n"
+        "- Thiếu thông tin → để trống\n"
+        "- Quad chỉ điền khi hợp đồng có giá, không tự tính\n"
+        "- **Single = Double**\n"
+        "- Không có Triple → **Triple = Double + Extra Bed**\n\n"
+        "**🏡 Rule villa**\n"
+        "- Villa từ **2 phòng ngủ trở lên** (vd 'Two-Bedroom Pool Villa') → giá chỉ điền cột **Quad**\n"
+        "- Villa còn lại → dùng rule khách sạn"
+    )
 
-
-def process_villa_files(files, progress=gr.Progress()):
-    return _process(files, extract_villa_rates, progress)
-
-
-def _build_tab(process_fn):
     file_input = gr.File(
         label="File hợp đồng",
         file_count="multiple",
@@ -82,28 +88,7 @@ def _build_tab(process_fn):
 
     log_output = gr.Textbox(label="Nhật ký xử lý", lines=10, interactive=False)
 
-    run_btn.click(fn=process_fn, inputs=file_input, outputs=[output_file, log_output])
-
-
-with gr.Blocks(title="Trích xuất bảng giá khách sạn") as demo:
-    gr.Markdown(
-        "# 🏨 Trích xuất bảng giá → Excel\n"
-        "Tải lên một hoặc nhiều file hợp đồng (**PDF, DOCX, DOC, TXT**), mỗi file input trả về **1 file Excel riêng** (cùng tên) "
-        "với các cột cố định: City, Hotel Name, Room type, Capacity, From, Until, Single, Double, Extra Bed, Triple, Quad."
-    )
-
-    with gr.Tabs():
-        with gr.Tab("🏨 Khách sạn"):
-            gr.Markdown("Giá phòng tách theo occupancy: Single / Double / Extra Bed / Triple / Quad.")
-            _build_tab(process_hotel_files)
-
-        with gr.Tab("🏡 Villa"):
-            gr.Markdown(
-                "Giống hệt tab Khách sạn, chỉ thêm 1 rule: villa có tên ghi rõ **từ 2 phòng ngủ trở lên** "
-                "(vd '2 Bedroom', 'Four-bedrooms') → giá chỉ điền vào cột **Quad**. "
-                "Villa khác (không ghi rõ số phòng ngủ) được trích xuất bình thường như 1 phòng khách sạn."
-            )
-            _build_tab(process_villa_files)
+    run_btn.click(fn=process_files, inputs=file_input, outputs=[output_file, log_output])
 
 if __name__ == "__main__":
     # Mặc định chỉ máy này truy cập được (127.0.0.1). Đặt GRADIO_SERVER_NAME=0.0.0.0
